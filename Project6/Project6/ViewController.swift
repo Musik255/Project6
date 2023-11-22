@@ -15,15 +15,22 @@ class TableViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        if let startWordsUrl = Bundle.main.url(forResource: "start", withExtension: "txt"){
-            if let allWordsLongString = try? String(contentsOf: startWordsUrl){
-                allWords = allWordsLongString.components(separatedBy: "\n")
-            }
-        }
+//        if let startWordsUrl = Bundle.main.url(forResource: "start", withExtension: "txt"){
+//            if let allWordsLongString = try? String(contentsOf: startWordsUrl){
+//                allWords = allWordsLongString.components(separatedBy: "\n")
+//            }
+//        }
+        allWords.append("Иллюминатор")
+        allWords.append("Ноутбук")
+        allWords.append("Превосходный")
+        allWords.append("Телепорт")
+        allWords.append("Полотенце")
+        allWords.append("Реставрация")
+        allWords.append("Волшебник")
         
-        if allWords.isEmpty{
-            allWords.append("silkworm")
-        }
+//        if allWords.isEmpty{
+//            allWords.append("silkworm")
+//        }
         
         
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addingNewWordAction))
@@ -71,10 +78,49 @@ class TableViewController: UITableViewController {
 //        }
         
     }
-    func submit(_ asnwer : String){
+    
+    
+    func submit(_ answer : String){
         
+        let lowerAnswer = answer.lowercased()
+        if isPossible(word: lowerAnswer) && isReal(word: lowerAnswer) && isOriginal(word: lowerAnswer){
+            usedWords.insert(answer, at: 0)
+            
+            
+            let indexPath = IndexPath(row: 0, section: 0)
+            tableView.insertRows(at: [indexPath], with: .automatic)
+            
+        }
+        else{
+            return
+        }
     }
-
+     
+    
+    
+    func isPossible(word : String) -> Bool{
+        guard var titleWord = title?.lowercased()  else { return false }
+        
+        for letter in word{
+            if titleWord.contains(letter){
+                titleWord.remove(at: titleWord.firstIndex(of: letter)!)
+            }
+            else {
+                return false
+            }
+        }
+        return true
+    }
+    func isOriginal(word : String) -> Bool{
+        return !usedWords.contains(word)
+    }
+    func isReal(word : String) -> Bool {
+        let checker = UITextChecker()
+        let range = NSRange(location: 0, length: word.utf16.count)
+        let misspelledRange = checker.rangeOfMisspelledWord(in: word, range: range, startingAt: 0, wrap: false , language: "ru")
+        
+        return misspelledRange.location == NSNotFound
+    }
 
 }
 
