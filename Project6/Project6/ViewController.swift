@@ -20,13 +20,9 @@ class TableViewController: UITableViewController {
 //                allWords = allWordsLongString.components(separatedBy: "\n")
 //            }
 //        }
-        allWords.append("Иллюминатор")
-        allWords.append("Ноутбук")
-        allWords.append("Превосходный")
+
         allWords.append("Телепорт")
-        allWords.append("Полотенце")
-        allWords.append("Реставрация")
-        allWords.append("Волшебник")
+
         
 //        if allWords.isEmpty{
 //            allWords.append("silkworm")
@@ -82,23 +78,72 @@ class TableViewController: UITableViewController {
     
     func submit(_ answer : String){
         
+        let alertController = UIAlertController(title: "", message: nil, preferredStyle: .alert)
+        
+        
         let lowerAnswer = answer.lowercased()
-        if isPossible(word: lowerAnswer) && isReal(word: lowerAnswer) && isOriginal(word: lowerAnswer){
-            usedWords.insert(answer, at: 0)
-            
-            
-            let indexPath = IndexPath(row: 0, section: 0)
-            tableView.insertRows(at: [indexPath], with: .automatic)
-            
-        }
-        else{
+        //        if isPossible(word: lowerAnswer) && isReal(word: lowerAnswer) && isOriginal(word: lowerAnswer) && isMore3Char(word: lowerAnswer) && isStartWord(word: lowerAnswer){
+        //            usedWords.insert(answer, at: 0)
+        //
+        //
+        //            let indexPath = IndexPath(row: 0, section: 0)
+        //            tableView.insertRows(at: [indexPath], with: .automatic)
+        //        }
+        if isStartWord(word: lowerAnswer){
+            print(lowerAnswer)
+            print(title!)
+            alertController.title = "isStartWord"
+            alertController.addAction(UIAlertAction(title: "cancel", style: .cancel))
+            present(alertController, animated: true)
             return
         }
+        if isNotOriginal(word: lowerAnswer){
+            alertController.title = "isOriginal"
+            alertController.addAction(UIAlertAction(title: "cancel", style: .cancel))
+            present(alertController, animated: true)
+            return
+        }
+        if isLess3Char(word: lowerAnswer){
+            alertController.title = "isMore3Char"
+            alertController.addAction(UIAlertAction(title: "cancel", style: .cancel))
+            present(alertController, animated: true)
+            return
+        }
+        if isNotPossible(word: lowerAnswer){
+            alertController.title = "isPossible"
+            alertController.addAction(UIAlertAction(title: "cancel", style: .cancel))
+            present(alertController, animated: true)
+            return
+        }
+//        if isReal(word: lowerAnswer){
+//            alertController.title = "isReal"
+//            alertController.addAction(UIAlertAction(title: "cancel", style: .cancel))
+//            present(alertController, animated: true)
+//            return
+//        }
+        
+        usedWords.insert(answer, at: 0)
+        let indexPath = IndexPath(row: 0, section: 0)
+        tableView.insertRows(at: [indexPath], with: .automatic)
+        
+        
     }
-     
+    func isStartWord (word : String) -> Bool{
+        if word == title!.lowercased(){
+            print("true")
+            return true
+        }
+        else{
+            print("false")
+            return false
+        }
+    }
+    func isNotOriginal(word : String) -> Bool{
+        return usedWords.contains(word.lowercased())
+    }
     
     
-    func isPossible(word : String) -> Bool{
+    func isNotPossible(word : String) -> Bool{
         guard var titleWord = title?.lowercased()  else { return false }
         
         for letter in word{
@@ -106,14 +151,20 @@ class TableViewController: UITableViewController {
                 titleWord.remove(at: titleWord.firstIndex(of: letter)!)
             }
             else {
-                return false
+                return true
             }
         }
-        return true
+        return false
     }
-    func isOriginal(word : String) -> Bool{
-        return !usedWords.contains(word)
+    
+    func isLess3Char (word  : String) -> Bool{
+        if word.count < 3{
+            return true
+        }
+        return false
     }
+    
+    
     func isReal(word : String) -> Bool {
         let checker = UITextChecker()
         let range = NSRange(location: 0, length: word.utf16.count)
@@ -121,6 +172,10 @@ class TableViewController: UITableViewController {
         
         return misspelledRange.location == NSNotFound
     }
+    
+    
+    
+
 
 }
 
